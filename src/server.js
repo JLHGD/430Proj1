@@ -11,22 +11,23 @@ const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getIndexStyle,
-    '/getUsers': jsonHandler.getUsers,
-    '/updateUser': jsonHandler.updateUser,
+    '/getMonsters': jsonHandler.getMonsters,
+    '/getNewestMonster': jsonHandler.getNewestMonster,
+    // '/updateUser': jsonHandler.updateUser,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
-    '/getUsers': jsonHandler.getUsersMeta,
+    '/getMonsters': jsonHandler.getMonstersMeta,
     notFound: jsonHandler.notFoundMeta,
   },
   POST: {
-    '/addUser': jsonHandler.addUser,
+    '/generateMonster': jsonHandler.generateMonster,
     notFound: jsonHandler.notFoundMeta,
   },
 };
 
 const handlePost = (request, response, parsedUrl) => {
-  if (parsedUrl.pathname === '/addUser') {
+  if (parsedUrl.pathname === '/generateMonster') {
     const body = [];
 
     request.on('error', (err) => {
@@ -43,7 +44,7 @@ const handlePost = (request, response, parsedUrl) => {
       const bodyString = Buffer.concat(body).toString();
       const bodyParams = query.parse(bodyString);
 
-      jsonHandler.addUser(request, response, bodyParams);
+      jsonHandler.generateMonster(request, response, bodyParams);
     });
   }
 };

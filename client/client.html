@@ -8,53 +8,72 @@
   <script type="text/babel">
 
         const parseJSON = (xhr, content) => {
-            if(xhr.response && xhr.getResponseHeader('Content-Type') === 'application/json'){
-                const obj = JSON.parse(xhr.response);
-                console.dir(obj);
+            if(xhr.response){
 
-                if(obj.message){
-                    content.innerHTML += `<p>${obj.message}</p>`;
+                content.innerHTML = "";
+
+                if(xhr.getResponseHeader('Content-Type') === 'application/json'){
+                    const obj = JSON.parse(xhr.response);
+
+                    if(obj.newestMonster){
+                        content.innerHTML += `<p><b>${obj.newestMonster.monster.name}</b></p>`;
+                        content.innerHTML += `<p>${obj.newestMonster.monster.description}</p>`;
+                        content.innerHTML += JSON.stringify(obj.newestMonster.monster.stats);
+                    }
+                    else if(obj.monsters){
+                        let keys = Object.keys(obj.monsters);
+                        for(let key of keys){
+                            content.innerHTML += `<p><b>${obj.monsters[key].name}</b></p>`;
+                            content.innerHTML += `<p>${obj.monsters[key].description}</p>`;
+                            content.innerHTML += `<p>${JSON.stringify(obj.monsters[key].stats)}</p>`;
+                        }
+                    }
                 }
+                else if(xhr.getResponseHeader('Content-Type') === 'text/xml'){
+                    const name = xhr.responseXML.querySelector('name').textContent;
+                    content.innerHTML += `<p>${name}</p>`;
 
-                if(obj.users) {
-                    const users = JSON.stringify(obj.users);
-                    content.innerHTML += `<p>${users}</p>`;
-                  }
+                    const desc = xhr.responseXML.querySelector('desc').textContent;
+                    content.innerHTML += `<p>${desc}</p>`;
+
+                    const stats = xhr.responseXML.querySelector('stats').textContent;
+                    content.innerHTML += `<p>${stats}</p>`;
+                }
             }
         }
 
         const handleResponse = (xhr, parseResponse) => {
             // const type = xhr.getResponseHeader('content-type');
 
-            const content = document.querySelector('#content');
-
-              switch(xhr.status){
-                  case 200:
-                      content.innerHTML = '<b>Success<b>';
-                      break;
-                  case 201:
-                      content.innerHTML = '<b>Created<b>';
-                      break;
-                  case 204:
-                      content.innerHTML = '<b>Updated (No Content)<b>';
-                      break;
-                  case 400:
-                      content.innerHTML = '<b>Bad Request<b>';
-                      break;
-                  case 404:
-                      content.innerHTML = '<b>Resource Not Found<b>';
-                      break;
-                  default:
-                      content.innerHTML = '<b>Error Code Not Implemented By Client<b>';
-                      break;
-              }
+            // const content = document.querySelector('#content');
+            //
+            //   switch(xhr.status){
+            //       case 200:
+            //           content.innerHTML = '<b>Success<b>';
+            //           break;
+            //       case 201:
+            //           content.innerHTML = '<b>Created<b>';
+            //           break;
+            //       case 204:
+            //           content.innerHTML = '<b>Updated (No Content)<b>';
+            //           break;
+            //       case 400:
+            //           content.innerHTML = '<b>Bad Request<b>';
+            //           break;
+            //       case 404:
+            //           content.innerHTML = '<b>Resource Not Found<b>';
+            //           break;
+            //       default:
+            //           content.innerHTML = '<b>Error Code Not Implemented By Client<b>';
+            //           break;
+            //   }
 
             parseJSON(xhr, content);
         };
 
         const requestUpdate = (e, userForm) => {
-            const url = userForm.querySelector('#urlField').value;
-            const method = userForm.querySelector('#methodSelect').value;
+            const url = userForm.getAttribute('action');
+            const method = userForm.getAttribute('method');
 
             const xhr = new XMLHttpRequest();
             xhr.open(method, url);
@@ -74,38 +93,58 @@
             return false;
         };
 
-        const sendPost = (e, nameForm) => {
+        const getChecked = (radioButtonGroup) => {
+            // From https://www.javascripttutorial.net/javascript-dom/javascript-radio-button/
+            let checkedResult;
+            for (let result of radioButtonGroup) {
+                if(result.checked){
+                    checkedResult = result.value;
+                    return checkedResult;
+                }
+            }
+            return '';
+        };
+
+        const sendPost = (e, questionsForm) => {
             e.preventDefault();
 
-            const nameAction = nameForm.getAttribute('action');
-            const nameMethod = nameForm.getAttribute('method');
+            let q1 = questionsForm.querySelectorAll('input[name="q1"]');
+            let q2 = questionsForm.querySelectorAll('input[name="q2"]');
+            let q3 = questionsForm.querySelectorAll('input[name="q3"]');
 
-            const nameField = nameForm.querySelector("#nameField");
-            const ageField = nameForm.querySelector("#ageField");
+            let q1Result = getChecked(q1);
+            let q2Result = getChecked(q2);
+            let q3Result = getChecked(q3);
+
+            const questionsAction = questionsForm.getAttribute('action');
+            const questionsMethod = questionsForm.getAttribute('method');
 
             const xhr = new XMLHttpRequest();
-            xhr.open(nameMethod, nameAction);
+            xhr.open(questionsMethod, questionsAction);
 
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
             xhr.onload = () => handleResponse(xhr, true);
 
-            const formData = `name=${nameField.value}&age=${ageField.value}`;
+            const formData = `q1=${q1Result}&q2=${q2Result}&q3=${q3Result}`;
             xhr.send(formData);
 
             return false;
         };
 
         const init = () => {
-            const nameForm = document.querySelector('#nameForm');
-            const userForm = document.querySelector('#userForm');
+            const questionsForm = document.querySelector('#questionsForm');
+            const monstersForm = document.querySelector('#monstersForm');
+            const newestMonsterForm = document.querySelector('#newestMonsterForm');
 
-            const getUsers = (e) => requestUpdate(e, userForm);
-            const addUser = (e) => sendPost(e, nameForm);
+            const sendQuizResults = (e) => sendPost(e, questionsForm);
+            const getMonsters = (e) => requestUpdate(e, monstersForm);
+            const getNewestMonster = (e) => requestUpdate(e, newestMonsterForm);
 
-            userForm.addEventListener('submit', getUsers);
-            nameForm.addEventListener('submit', addUser);
+            questionsForm.addEventListener('submit', sendQuizResults);
+            monstersForm.addEventListener('submit', getMonsters);
+            newestMonsterForm.addEventListener('submit', getNewestMonster);
         };
 
         window.onload = init;
@@ -114,25 +153,67 @@
 </head>
 <body>
   <section id="top">
-    <h3>POST Status Code Tests</h3>
-    <form id="nameForm" action="/addUser" method="post">
-      <label for="name">Name: </label>
-      <input id="nameField" type="text" name="name" />
-      <label for="age">Age: </label>
-      <input id="ageField" type="number" name="age" min="0" max="100" step="1"/>
-      <input type="submit" value="Add User" />
+
+    <h1>Monster Generator</h1>
+
+    <form id="questionsForm" action="/generateMonster" method="post">
+
+        <!---<fieldset id="q1">--->
+          <h4>What type of creature are you seeking?</h3>
+          <input id="q1a" type="radio" name="q1" value="S"/>
+          <label for="q1a">Serious</label>
+
+          <input id="q1b" type="radio" name="q1" value="C"/>
+          <label for="q1b">Cute/Funny</label>
+
+          <input id="q1c" type="radio" name="q1" value="N"/>
+          <label for="q1c">Either</label>
+        <!---</fieldset>--->
+
+        <!---<fieldset id="q2">--->
+          <h4>If you were to describe this creature, would you describe it as…</h3>
+          <input id="q2a" type="radio" name="q2" value="Scaled"/>
+          <label for="q2a">Scaled</label>
+
+          <input id="q2b" type="radio" name="q2" value="Furred"/>
+          <label for="q2b">Furred</label>
+
+          <input id="q2c" type="radio" name="q2" value="Winged"/>
+          <label for="q2c">Winged</label>
+
+          <input id="q2d" type="radio" name="q2" value="Natural"/>
+          <label for="q2d">Natural</label>
+
+          <input id="q2e" type="radio" name="q2" value="Terrible"/>
+          <label for="q2e">Terrible</label>
+
+          <input id="q2f" type="radio" name="q2" value="ExtraPlanar"/>
+          <label for="q2f">Extra-planar</label>
+        <!---</fieldset>--->
+
+        <!---<fieldset id="q3">--->
+          <h4>This monster is…</h3>
+          <input id="q3a" type="radio" name="q3" value="Phys"/>
+          <label for="q3a">From a distant land or biome</label>
+
+          <input id="q3b" type="radio" name="q3" value="Abil"/>
+          <label for="q3b">A formidable foe, or ally</label>
+
+          <input id="q3c" type="radio" name="q3" value="Pers"/>
+          <label for="q3c">Peculiar</label>
+        <!---</fieldset>--->
+
+      <input type="submit" value="Generate"/>
     </form>
-    <form id="userForm" action="/getUsers" method="get">
-      <select id='urlField'>
-        <option value='/getUsers'>/getUsers</option>
-        <option value='/notReal'>/notReal</option>
-      </select>
-      <select id="methodSelect">
-        <option value="get">GET</option>
-        <option value="head">HEAD</option>
-      </select>
-      <input type="submit" value="Get User" />
+
+    <form id="monstersForm" action="/getMonsters" method="get">
+        <input type="submit" value="Show All Monster"/>
     </form>
+
+    <form id="newestMonsterForm" action="/getNewestMonster" method="get">
+        <input type="submit" value="Show Newest Monster"/>
+    </form>
+
   </section>
   <section id="content">
   </section>

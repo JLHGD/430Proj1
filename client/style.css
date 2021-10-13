@@ -1,6 +1,9 @@
 html {
   /*From https://cssgradient.io/*/
-  background: linear-gradient(90deg, rgba(136,136,136,1) 0%, rgba(136,136,136,0.5046393557422969) 65%, rgba(0,0,0,0) 80%);
+  background-color: rgb(0, 0, 0);
+  background-image: linear-gradient(90deg, rgba(136,136,136,1) 0%, rgba(136,136,136,0.5046393557422969) 65%, rgba(0,0,0,0) 80%), url("background.png");
+  background-position: center, right top;
+  background-repeat: repeat, repeat-y;
 }
 
 html, body {

@@ -73,9 +73,11 @@ const generateMonster = (request, response, body) => {
 
   let responseCode = 201;
 
-  const nameObj = resultParser.getNameObj(body); // Gets the name as an object with all of the name's parts and attributes
+  // Gets the name as an object with all of the name's parts and attributes
+  const nameObj = resultParser.getNameObj(body);
   const { name } = nameObj;
-  const description = resultParser.getDescription(nameObj); // Gets the description of the monster as a string
+  // Gets the description of the monster as a string
+  const description = resultParser.getDescription(nameObj);
   const stats = resultParser.getStats(); // Gets the stats of the monster as an object
 
   if (monsters[name]) {

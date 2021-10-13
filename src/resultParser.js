@@ -245,7 +245,8 @@ const getNameObj = (body) => {
   return nameObj;
 };
 
-// Gets a description by using information from the name object to get the description values and puts them into a string
+// Gets a description by using information from the name object to get the
+// description values and puts them into a string
 const getDescription = (nameObj) => `${nameObj.nameOne.desc} \n ${nameObj.nameTwo.desc}`;
 
 // Randomly generates stats form 1 to 10

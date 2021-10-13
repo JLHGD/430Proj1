@@ -3,6 +3,7 @@ const fs = require('fs'); // pull in the file system module
 const index = fs.readFileSync(`${__dirname}/../client/client.html`); // The HTML page
 const indexCSS = fs.readFileSync(`${__dirname}/../client/style.css`); // The style sheet
 const indexSH = fs.readFileSync(`${__dirname}/../client/styleHelper.js`); // The style helper for making the questions visible / invisible
+const backgroundImage = fs.readFileSync(`${__dirname}/../client/background.png`);
 
 // General respond function, responds with 200 with a given content type
 const respond = (request, response, content, type) => {
@@ -20,8 +21,12 @@ const getIndexStyle = (request, response) => respond(request, response, indexCSS
 // Gets the HTML file
 const getIndex = (request, response) => respond(request, response, index, 'text/html');
 
+// Gets the background image file
+const getIndexImage = (request, response) => respond(request, response, backgroundImage, 'image/png');
+
 module.exports = {
   getIndexStyleHelper,
   getIndexStyle,
   getIndex,
+  getIndexImage,
 };

@@ -7,13 +7,14 @@ const jsonHandler = require('./jsonResponses.js');
 
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
+// All URLs that are handled
 const urlStruct = {
   GET: {
     '/': htmlHandler.getIndex,
     '/style.css': htmlHandler.getIndexStyle,
+    '/styleHelper.js': htmlHandler.getIndexStyleHelper,
     '/getMonsters': jsonHandler.getMonsters,
     '/getNewestMonster': jsonHandler.getNewestMonster,
-    // '/updateUser': jsonHandler.updateUser,
     notFound: jsonHandler.notFound,
   },
   HEAD: {
@@ -26,6 +27,7 @@ const urlStruct = {
   },
 };
 
+// Handles any POST requests and sends the gotten parameters to the generateMonster function
 const handlePost = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/generateMonster') {
     const body = [];
@@ -49,6 +51,10 @@ const handlePost = (request, response, parsedUrl) => {
   }
 };
 
+// Handles all requests
+// If the method is POST, then handle the request in the handlePost function
+// Otherwise, handle it by getting the URL and sneding it to the jsonHandler or
+// return a 404
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 

@@ -1,7 +1,7 @@
 const resultParser = require('./resultParser.js');
 
-const newestMonster = {};
-const monsters = {};
+const newestMonster = {}; // Only the newest / most recently created monster created is stored here
+const monsters = {}; // All monsters that are created are stored here
 
 // Generates an XML string with a given object
 const generateXML = (obj) => {
@@ -38,11 +38,7 @@ const respondMeta = (request, response, status, type) => {
   response.end();
 };
 
-/// //////////////////////////////////////////////////////////////////////////////////////////////
-/// //////////////////////////////////////// REPLACE THESE ///////////////////////////////////////
-/// //////////////////////////////////////////////////////////////////////////////////////////////
-
-// Gets all users in the user object
+// Gets all monsters in the monsters object
 const getMonsters = (request, response) => {
   const responseJSON = {
     monsters,
@@ -51,10 +47,10 @@ const getMonsters = (request, response) => {
   return respond(request, response, 200, responseJSON, 'application/json');
 };
 
-// Gets all users in the user object as meta data
+// Gets all monsters in the monsters object as meta data
 const getMonstersMeta = (request, response) => respondMeta(request, response, 200, 'application/json');
 
-// Gets all users in the user object
+// Gets the most recently created monster object
 const getNewestMonster = (request, response) => {
   const responseJSON = {
     newestMonster,
@@ -62,61 +58,47 @@ const getNewestMonster = (request, response) => {
 
   return respond(request, response, 200, responseJSON, 'application/json');
 };
-//
-// // Updates the user object with a new user
-// const updateUser = (request, response) => {
-//   const newUser = {
-//     createdAt: Date.now(),
-//   };
-//
-//   users[newUser.createAt] = newUser;
-//
-//   return respond(request, response, 201, newUser);
-// };
 
-// Adds user to the user oject given user input in the html form
+// Adds a monster to the monster oject given user input in the html form
 const generateMonster = (request, response, body) => {
   const responseJSON = {
     message: 'All questions must be filled out',
   };
 
+  // If one or more of the questions aren't filled out, return 400 bad request
   if (!body.q1 || !body.q2 || !body.q3) {
     responseJSON.id = 'missingParams';
     return respond(request, response, 400, responseJSON, 'application/json');
   }
 
-  const responseCode = 201;
+  let responseCode = 201;
 
-  // if (users[body.name]) {
-  //   // User exists and is updated
-  //   responseCode = 204;
-  // } else {
-
-  const nameObj = resultParser.getNameObj(body);
+  const nameObj = resultParser.getNameObj(body); // Gets the name as an object with all of the name's parts and attributes
   const { name } = nameObj;
-  const description = resultParser.getDescription(nameObj);
-  const stats = resultParser.getStats();
+  const description = resultParser.getDescription(nameObj); // Gets the description of the monster as a string
+  const stats = resultParser.getStats(); // Gets the stats of the monster as an object
 
-  monsters[name] = {};
-  monsters[name].name = name;
-  // }
+  if (monsters[name]) {
+    // Monster exists and is updated
+    responseCode = 204;
+  } else {
+    // If the monster doesn't exist, create a monster and set it as the newest monster
+    monsters[name] = {};
+    monsters[name].name = name;
 
-  monsters[name].description = description;
-  monsters[name].stats = stats;
+    monsters[name].description = description;
+    monsters[name].stats = stats;
 
-  newestMonster.monster = monsters[name];
+    newestMonster.monster = monsters[name];
+  }
 
   if (responseCode === 201) {
-    responseJSON.message = 'Created Successfully';
+    responseJSON.message = `${name} Created Successfully`;
     return respond(request, response, responseCode, responseJSON, 'application/json');
   }
 
   return respondMeta(request, response, responseCode, 'application/json');
 };
-
-/// //////////////////////////////////////////////////////////////////////////////////////////////
-/// //////////////////////////////////////// REPLACE THESE ///////////////////////////////////////
-/// //////////////////////////////////////////////////////////////////////////////////////////////
 
 // Respond with a 404 if the url the user requested doesn't exist
 const notFound = (request, response) => {
@@ -133,7 +115,6 @@ module.exports = {
   getMonsters,
   getMonstersMeta,
   getNewestMonster,
-  // updateUser,
   generateMonster,
   notFound,
   notFoundMeta,

@@ -1,21 +1,44 @@
+html {
+  /*From https://cssgradient.io/*/
+  background: linear-gradient(90deg, rgba(136,136,136,1) 0%, rgba(136,136,136,0.5046393557422969) 65%, rgba(0,0,0,0) 80%);
+}
+
 html, body {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
+
+  font-family: 'Titillium Web', sans-serif;
+
 }
 
-#top {
-  text-align: center;
-  margin: 0 auto;
+h1 {
+    /*From https://fonts.google.com/specimen/Philosopher?category=Sans+Serif*/
+    font-family: 'Philosopher', sans-serif;
 }
 
-#top h1 {
-  font-size: 2em;
+h2, h3 {
+    /*From https://fonts.google.com/specimen/Padauk?category=Sans+Serif*/
+    font-family: 'Padauk', sans-serif;
 }
 
-#content {
-  margin-top: 100px;
-  font-size: 2em;
-  text-align: center;
+h4, h5, h6{
+    /*From https://fonts.google.com/specimen/Spartan?category=Sans+Serif*/
+    font-family: 'Spartan', sans-serif;
+}
+
+#generateButton:hover {
+    background-color: hsl(141, 53%, 70%);
+}
+
+#generateButton:active {
+    background-color: hsl(141, 53%, 30%);
+}
+
+/*Fade in the questions when they are enabled, and fade them out when they are disabled*/
+#question1, #question2, #question3 {
+    animation: fadeIn 0.5s;
+}
+
+/*Key frames for the fade in animation*/
+@keyframes fadeIn{
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
